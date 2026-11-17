@@ -704,3 +704,313 @@ document.querySelector('.header-right .pill').textContent='● Not connected';
 }
 </script></body>
 </html>
+/* VYNTRA PHASE 3 UPGRADE
+   Paste this entire script immediately before </body> in index.html.
+   It extends the existing Vyntra app; it does not replace Supabase auth or wallet code.
+*/
+(() => {
+  if (window.VYNTRA_PHASE3_LOADED) return;
+  window.VYNTRA_PHASE3_LOADED = true;
+
+  const style = document.createElement('style');
+  style.textContent = `
+    .v3-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+    .v3-field{display:grid;gap:6px;margin:10px 0}
+    .v3-field label{font-size:11px;color:#aab8d0;font-weight:700}
+    .v3-field input,.v3-field select{width:100%}
+    #v3AdminNav{display:none}
+    @media(max-width:520px){.v3-grid{grid-template-columns:1fr}.v3-table{min-width:620px}}
+  `;
+  document.head.appendChild(style);
+
+  const main = document.querySelector('main.main');
+  const sidebar = document.querySelector('.sidebar');
+  const mobile = document.querySelector('.mobilebar');
+  if (!main || !sidebar || !mobile) return;
+
+  main.insertAdjacentHTML('beforeend', `
+    <section id="profile" class="page">
+      <h1 class="panel-title">My profile</h1>
+      <p class="page-intro">Manage your Vyntra account information and password.</p>
+      <div class="v3-grid">
+        <div class="card">
+          <h2 style="font-size:16px;margin:0 0 8px">Personal information</h2>
+          <div class="v3-field"><label for="v3FullName">Full name</label><input class="field" id="v3FullName" maxlength="100" placeholder="Your full name"></div>
+          <div class="v3-field"><label for="v3Email">Email address</label><input class="field" id="v3Email" type="email" readonly></div>
+          <div class="v3-field"><label for="v3Role">Account type</label><input class="field" id="v3Role" readonly value="customer"></div>
+          <button class="btn" id="v3SaveProfile">Save profile</button>
+        </div>
+        <div class="card">
+          <h2 style="font-size:16px;margin:0 0 8px">Change password</h2>
+          <div class="v3-field"><label for="v3Password">New password</label><input class="field" id="v3Password" type="password" autocomplete="new-password" placeholder="At least 8 characters"></div>
+          <div class="v3-field"><label for="v3Password2">Confirm new password</label><input class="field" id="v3Password2" type="password" autocomplete="new-password" placeholder="Repeat new password"></div>
+          <button class="btn" id="v3ChangePassword">Update password</button>
+        </div>
+      </div>
+      <div class="section-head"><h2>Account security</h2></div>
+      <div class="notice">Never share your password or verification codes. Vyntra support will never ask you to send your password.</div>
+    </section>
+
+    <section id="requests" class="page">
+      <h1 class="panel-title">My service requests</h1>
+      <p class="page-intro">Track requests you have submitted for Vyntra services.</p>
+      <div class="notice">Submitting a request does not move money, issue a bank account or activate a service. Requests remain pending until an approved provider is connected and the request is reviewed.</div>
+      <div class="card" style="overflow:auto">
+        <table class="table v3-table"><thead><tr><th>SERVICE</th><th>DETAILS</th><th>SUBMITTED</th><th>STATUS</th></tr></thead>
+        <tbody id="v3RequestRows"><tr><td colspan="4" class="empty">Sign in to view your requests.</td></tr></tbody></table>
+      </div>
+    </section>
+
+    <section id="admin" class="page">
+      <h1 class="panel-title">Vyntra admin dashboard</h1>
+      <p class="page-intro">Private operational overview. Only accounts assigned the admin role can access this page.</p>
+      <div class="notice" id="v3AdminNotice">Administrator access is restricted.</div>
+      <div class="grid">
+        <div class="card stat"><div class="label">Customers</div><div class="value" id="v3Customers">—</div><div class="sub">Registered profiles</div></div>
+        <div class="card stat"><div class="label">Transactions</div><div class="value" id="v3Transactions">—</div><div class="sub">Ledger records</div></div>
+        <div class="card stat"><div class="label">Pending requests</div><div class="value" id="v3Pending">—</div><div class="sub">Awaiting review</div></div>
+      </div>
+      <div class="section-head"><h2>Manage service requests</h2></div>
+      <div class="card" style="overflow:auto"><table class="table v3-table">
+        <thead><tr><th>CUSTOMER ID</th><th>SERVICE</th><th>DETAILS</th><th>DATE</th><th>STATUS</th><th>ACTION</th></tr></thead>
+        <tbody id="v3AdminRequests"><tr><td colspan="6" class="empty">Admin access required.</td></tr></tbody>
+      </table></div>
+      <div class="section-head"><h2>Customers</h2></div>
+      <div class="card" style="overflow:auto"><table class="table v3-table">
+        <thead><tr><th>NAME</th><th>EMAIL</th><th>JOINED</th></tr></thead>
+        <tbody id="v3AdminCustomers"><tr><td colspan="3" class="empty">Admin access required.</td></tr></tbody>
+      </table></div>
+      <div class="section-head"><h2>Provider connections</h2></div>
+      <div class="list">
+        <div class="item"><div><strong>USD / GBP / EUR accounts and FX</strong><small>Partner onboarding and API credentials pending</small></div><span class="badge yellow">Pending</span></div>
+        <div class="item"><div><strong>Virtual phone numbers</strong><small>Telecom provider agreement and API credentials pending</small></div><span class="badge yellow">Pending</span></div>
+        <div class="item"><div><strong>Crypto exchange</strong><small>Authorised provider and compliance approval pending</small></div><span class="badge yellow">Pending</span></div>
+        <div class="item"><div><strong>Gift cards</strong><small>Supplier and redemption integration pending</small></div><span class="badge yellow">Pending</span></div>
+        <div class="item"><div><strong>Deposits and withdrawals</strong><small>Payment provider integration pending</small></div><span class="badge yellow">Pending</span></div>
+      </div>
+    </section>
+  `);
+
+  const navItems = [
+    ['requests','▤','My requests'],
+    ['profile','👤','My profile'],
+    ['admin','⚙','Admin dashboard']
+  ];
+  const moreLabel = [...sidebar.querySelectorAll('.navlabel')].find(x => x.textContent.trim()==='MORE');
+  navItems.forEach(([page,icon,label]) => {
+    const b=document.createElement('button');
+    b.className='nav'; b.dataset.page=page;
+    if(page==='admin') { b.id='v3AdminNav'; b.style.display='none'; }
+    b.innerHTML='<span>'+icon+'</span>'+label;
+    b.addEventListener('click',()=>window.go(page));
+    if(moreLabel) moreLabel.after(b); else sidebar.appendChild(b);
+  });
+
+  // Keep the phone navigation simple; all other services remain available from Overview.
+  mobile.innerHTML = `
+    <button class="active" data-page="home"><span>⌂</span>Home</button>
+    <button data-page="accounts"><span>◎</span>Accounts</button>
+    <button data-page="wallet"><span>◈</span>Wallet</button>
+    <button data-page="numbers"><span>▣</span>Numbers</button>
+    <button data-page="requests"><span>▤</span>Requests</button>
+    <button data-page="profile"><span>👤</span>Profile</button>`;
+  mobile.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>window.go(b.dataset.page)));
+
+  const avatar=document.querySelector('.header-right .avatar');
+  if(avatar){avatar.style.cursor='pointer';avatar.title='My profile';avatar.addEventListener('click',()=>window.go('profile'));}
+
+  const safe = v => window.escapeHTML ? window.escapeHTML(v) : String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const dateText = v => { const d=new Date(v); return v&&!isNaN(d)?d.toLocaleString():'—'; };
+  let profile=null, modalRequest=null, requests=[];
+
+  function notify(m){ if(window.toast)window.toast(m); else alert(m); }
+  function isSignedIn(){ return typeof vyntraSession!=='undefined' && !!vyntraSession?.user?.id && typeof vyntraSupabase!=='undefined' && !!vyntraSupabase; }
+
+  async function loadProfile(){
+    if(!isSignedIn())return;
+    const {data,error}=await vyntraSupabase.from('profiles').select('id,full_name,email,role').eq('id',vyntraSession.user.id).maybeSingle();
+    if(error){notify('Profile could not load: '+error.message);return;}
+    profile=data||{full_name:vyntraSession.user.user_metadata?.full_name||'',email:vyntraSession.user.email,role:'customer'};
+    document.getElementById('v3FullName').value=profile.full_name||'';
+    document.getElementById('v3Email').value=vyntraSession.user.email||profile.email||'';
+    document.getElementById('v3Role').value=profile.role||'customer';
+    const adminNav=document.getElementById('v3AdminNav');
+    if(adminNav)adminNav.style.display=profile.role==='admin'?'flex':'none';
+  }
+
+  async function saveProfile(){
+    if(!isSignedIn())return;
+    const full_name=document.getElementById('v3FullName').value.trim();
+    if(!full_name){notify('Enter your full name.');return;}
+    const {data,error}=await vyntraSupabase.from('profiles').update({full_name,updated_at:new Date().toISOString()}).eq('id',vyntraSession.user.id).select('id').maybeSingle();
+    if(error||!data){notify('Profile not saved: '+(error?.message||'Profile record not found.'));return;}
+    await vyntraSupabase.auth.updateUser({data:{full_name}});
+    profile={...profile,full_name};notify('Profile updated.');
+  }
+  async function changePassword(){
+    const p=document.getElementById('v3Password').value,p2=document.getElementById('v3Password2').value;
+    if(p.length<8){notify('Use a password with at least 8 characters.');return;}
+    if(p!==p2){notify('The passwords do not match.');return;}
+    const {error}=await vyntraSupabase.auth.updateUser({password:p});
+    if(error){notify('Password update failed: '+error.message);return;}
+    document.getElementById('v3Password').value='';document.getElementById('v3Password2').value='';
+    notify('Password updated.');
+  }
+
+  async function loadRequests(){
+    if(!isSignedIn())return;
+    const body=document.getElementById('v3RequestRows');
+    body.innerHTML='<tr><td colspan="4" class="empty">Loading…</td></tr>';
+    const {data,error}=await vyntraSupabase.from('service_requests').select('id,service,request_data,status,created_at').eq('user_id',vyntraSession.user.id).order('created_at',{ascending:false}).limit(100);
+    if(error){body.innerHTML='<tr><td colspan="4" class="empty">Could not load requests. Run the Vyntra Phase 3 SQL first.</td></tr>';return;}
+    requests=data||[];
+    body.innerHTML=requests.length?requests.map(r=>'<tr><td>'+safe(String(r.service).replace(/_/g,' '))+'</td><td>'+safe(JSON.stringify(r.request_data||{}))+'</td><td>'+safe(dateText(r.created_at))+'</td><td><span class="badge">'+safe(r.status)+'</span></td></tr>').join(''):'<tr><td colspan="4" class="empty">No service requests yet.</td></tr>';
+  }
+
+  async function loadAdmin(){
+    if(profile?.role!=='admin'){document.getElementById('v3AdminNotice').textContent='This account has not been assigned administrator access.';return;}
+    document.getElementById('v3AdminNotice').textContent='Loading secure dashboard…';
+    try{
+      const [customers,tx,pending,reqs,users]=await Promise.all([
+        vyntraSupabase.from('profiles').select('id',{count:'exact',head:true}),
+        vyntraSupabase.from('transactions').select('id',{count:'exact',head:true}),
+        vyntraSupabase.from('service_requests').select('id',{count:'exact',head:true}).eq('status','pending'),
+        vyntraSupabase.from('service_requests').select('id,user_id,service,request_data,status,created_at').order('created_at',{ascending:false}).limit(30),
+        vyntraSupabase.from('profiles').select('id,full_name,email,created_at').order('created_at',{ascending:false}).limit(30)
+      ]);
+      const err=[customers.error,tx.error,pending.error,reqs.error,users.error].find(Boolean);if(err)throw err;
+      document.getElementById('v3Customers').textContent=customers.count??0;
+      document.getElementById('v3Transactions').textContent=tx.count??0;
+      document.getElementById('v3Pending').textContent=pending.count??0;
+      const statusOptions=['pending','under_review','approved','rejected','completed'];
+      document.getElementById('v3AdminRequests').innerHTML=(reqs.data||[]).map(r=>`
+        <tr><td>${safe(r.user_id)}</td><td>${safe(r.service)}</td><td>${safe(JSON.stringify(r.request_data||{}))}</td><td>${safe(dateText(r.created_at))}</td>
+        <td><select class="field" id="v3status_${safe(r.id)}">${statusOptions.map(s=>'<option '+(s===r.status?'selected':'')+' value="'+s+'">'+s+'</option>').join('')}</select></td>
+        <td><button class="btn ghost" onclick="window.VyntraPhase3.updateRequest('${safe(r.id)}')">Save</button></td></tr>`).join('')||'<tr><td colspan="6" class="empty">No requests yet.</td></tr>';
+      document.getElementById('v3AdminCustomers').innerHTML=(users.data||[]).map(u=>'<tr><td>'+safe(u.full_name||'—')+'</td><td>'+safe(u.email||'—')+'</td><td>'+safe(dateText(u.created_at))+'</td></tr>').join('')||'<tr><td colspan="3" class="empty">No customers found.</td></tr>';
+      document.getElementById('v3AdminNotice').textContent='Admin access confirmed. Customer and financial records are protected by Supabase row-level security.';
+    }catch(e){document.getElementById('v3AdminNotice').textContent='Dashboard could not load: '+e.message+'. Check the Phase 3 SQL policies.';}
+  }
+
+  async function updateRequest(id){
+    if(profile?.role!=='admin')return;
+    const status=document.getElementById('v3status_'+id)?.value;
+    const {error}=await vyntraSupabase.from('service_requests').update({status,updated_at:new Date().toISOString()}).eq('id',id);
+    if(error){notify('Could not update request: '+error.message);return;}
+    notify('Request status updated.');loadAdmin();
+  }
+
+  function field(label,id,type='text'){
+    return '<div class="v3-field"><label for="'+id+'">'+safe(label)+'</label><input class="field" id="'+id+'" type="'+type+'" '+(type==='number'?'min="0.01" step="0.01"':'')+'></div>';
+  }
+  function select(label,id,opts){
+    return '<div class="v3-field"><label for="'+id+'">'+safe(label)+'</label><select class="field" id="'+id+'">'+opts.map(x=>'<option value="'+safe(x[0])+'">'+safe(x[1])+'</option>').join('')+'</select></div>';
+  }
+  function openRequest(service,item='',country=''){
+    if(!isSignedIn()){notify('Please sign in first.');if(window.authUi)authUi(true);return;}
+    modalRequest={service,item,country};
+    let title='Service request',desc='This records your request only. It does not activate the service or move money.',fields='';
+    const currencies=['NGN','USD','GBP','EUR'];
+    if(service==='global_account'){title='Request '+item+' account';desc='Account issuance depends on an approved banking partner and eligibility.';fields=select('Currency','v3Currency',[[item,item]]);}
+    if(service==='virtual_number'){title='Request a virtual number';desc='Number availability depends on an approved telecom provider.';fields=select('Country','v3Country',countries.map(c=>[c[1],c[1]]))+select('Number type','v3Type',[['SMS reception','SMS reception'],['Voice capable','Voice capable']]);}
+    if(service==='crypto'){title='Crypto request';desc='No cryptocurrency will be bought, sold or transferred by this request.';fields=select('Action','v3Action',[['buy','Buy'],['sell','Sell']])+select('Asset','v3Asset',[['BTC','Bitcoin'],['ETH','Ethereum'],['USDT','Tether'],['USDC','USD Coin']])+field('Amount','v3Amount','number');}
+    if(service==='gift_card'){title='Gift card request';desc='Supplier fulfilment and buyback are not active until a provider is connected.';fields=select('Action','v3Action',[[item,item==='sell'?'Sell':'Buy']])+select('Brand','v3Brand',[['Amazon','Amazon'],['Apple','Apple'],['Google Play','Google Play'],['Steam','Steam'],['PlayStation','PlayStation'],['Xbox','Xbox'],['Walmart','Walmart'],['Razer Gold','Razer Gold']])+field('Amount (optional)','v3Amount','number');}
+    if(service==='deposit'||service==='withdrawal'){title=service==='deposit'?'Deposit enquiry':'Withdrawal enquiry';desc='No funds move when this request is submitted. A payment partner must be connected first.';fields=select('Currency','v3Currency',currencies.map(c=>[c,c]))+field('Amount','v3Amount','number');}
+    if(service==='fx'){title='FX conversion enquiry';desc='No currency conversion or money movement occurs at this stage.';fields=select('From currency','v3From',currencies.map(c=>[c,c]))+select('To currency','v3To',currencies.map(c=>[c,c]))+field('Amount','v3Amount','number');}
+    document.getElementById('modalTitle').textContent=title;
+    document.getElementById('modalText').textContent=desc;
+    document.getElementById('modalFields').innerHTML=fields;
+    if(service==='virtual_number'&&item&&document.getElementById('v3Country'))document.getElementById('v3Country').value=item;
+    if(service==='gift_card'&&country&&document.getElementById('v3Brand'))document.getElementById('v3Brand').value=country;
+    const confirm=document.getElementById('modalConfirm');
+    confirm.textContent='Submit request';confirm.onclick=submitRequest;
+    document.getElementById('modalback').classList.add('show');
+  }
+  async function submitRequest(){
+    if(!modalRequest||!isSignedIn())return;
+    const s=modalRequest.service,get=id=>document.getElementById(id)?.value?.trim()||'',data={};
+    if(s==='global_account'){data.currency=get('v3Currency');data.country=modalRequest.country;}
+    if(s==='virtual_number'){data.country=get('v3Country');data.number_type=get('v3Type');}
+    if(s==='crypto'){data.action=get('v3Action');data.asset=get('v3Asset');data.amount=Number(get('v3Amount'));}
+    if(s==='gift_card'){data.action=get('v3Action');data.brand=get('v3Brand');data.amount=get('v3Amount')?Number(get('v3Amount')):null;}
+    if(s==='deposit'||s==='withdrawal'){data.currency=get('v3Currency');data.amount=Number(get('v3Amount'));}
+    if(s==='fx'){data.from_currency=get('v3From');data.to_currency=get('v3To');data.amount=Number(get('v3Amount'));}
+    if(['crypto','deposit','withdrawal','fx'].includes(s)&&(!Number.isFinite(data.amount)||data.amount<=0)){notify('Enter an amount greater than zero.');return;}
+    if(s==='fx'&&data.from_currency===data.to_currency){notify('Choose two different currencies.');return;}
+    const b=document.getElementById('modalConfirm');b.disabled=true;
+    try{
+      const {error}=await vyntraSupabase.from('service_requests').insert({user_id:vyntraSession.user.id,service:s,request_data:data,status:'pending'});
+      if(error)throw error;
+      closeModal();notify('Request submitted. No payment or service was activated.');await loadRequests();window.go('requests');
+    }catch(e){notify('Could not save request: '+e.message+'. Run the Phase 3 SQL first.');}
+    finally{b.disabled=false;b.textContent='Submit request';}
+  }
+
+  function patchServiceButtons(){
+    document.querySelectorAll('#countryGrid .country .btn').forEach((b,i)=>{
+      const country=countries[i]?.[1]||'United States';b.textContent='Request number';b.onclick=()=>openRequest('virtual_number',country);
+    });
+    document.querySelectorAll('#cryptoList .item .btn').forEach((b,i)=>{const asset=['BTC','ETH','USDT','USDC'][i]||'BTC';b.textContent='Request trade';b.onclick=()=>openRequest('crypto',asset);});
+    document.querySelectorAll('#giftGrid .country').forEach(card=>{
+      const brand=card.querySelector('h3')?.textContent.replace(' Gift Card','')||'Gift card';
+      const buttons=card.querySelectorAll('button');
+      if(buttons[0]){buttons[0].textContent='Request buy';buttons[0].onclick=()=>openRequest('gift_card', 'buy', brand);}
+      if(buttons[1]){buttons[1].textContent='Request sell';buttons[1].onclick=()=>openRequest('gift_card', 'sell', brand);}
+    });
+    document.querySelectorAll('#wallet .actions button').forEach(b=>{
+      const t=b.textContent.toLowerCase();
+      if(t.includes('deposit'))b.onclick=()=>openRequest('deposit','NGN');
+      if(t.includes('withdraw'))b.onclick=()=>openRequest('withdrawal','NGN');
+    });
+    const walletActions=document.querySelector('#wallet .actions');
+    if(walletActions&&!document.getElementById('v3FxRequest')){
+      const fx=document.createElement('button');fx.id='v3FxRequest';fx.className='btn ghost';fx.textContent='Request FX conversion';
+      fx.onclick=()=>openRequest('fx','NGN');walletActions.appendChild(fx);
+    }
+  }
+
+  const originalCountries=window.renderCountries;
+  if(originalCountries)window.renderCountries=function(...args){const out=originalCountries(...args);setTimeout(patchServiceButtons,0);return out;};
+  const originalCrypto=window.renderCrypto;
+  if(originalCrypto)window.renderCrypto=function(...args){const out=originalCrypto(...args);setTimeout(patchServiceButtons,0);return out;};
+  const originalGifts=window.renderGifts;
+  if(originalGifts)window.renderGifts=function(...args){const out=originalGifts(...args);setTimeout(patchServiceButtons,0);return out;};
+
+  window.accountInfo=(currency,country)=>openRequest('global_account',currency,country);
+  window.openRequestModal=openRequest;
+  window.VyntraPhase3={updateRequest};
+
+  document.getElementById('v3SaveProfile').onclick=saveProfile;
+  document.getElementById('v3ChangePassword').onclick=changePassword;
+
+  const originalGo=window.go;
+  window.go=function(page){
+    if(page==='admin'&&profile?.role!=='admin'){notify('Administrator access is restricted.');page='home';}
+    originalGo(page);
+    if(page==='profile')loadProfile();
+    if(page==='requests')loadRequests();
+    if(page==='admin')loadAdmin();
+  };
+
+  const originalShow=window.showUserSession;
+  if(originalShow)window.showUserSession=function(session){
+    originalShow(session);
+    setTimeout(()=>{loadProfile();loadRequests();},0);
+  };
+
+  if(typeof vyntraSupabase!=='undefined'&&vyntraSupabase){
+    vyntraSupabase.auth.onAuthStateChange((event,session)=>{
+      if(!session){
+        profile=null;
+        const adminNav=document.getElementById('v3AdminNav');
+        if(adminNav)adminNav.style.display='none';
+      }else{
+        setTimeout(()=>{loadProfile();loadRequests();},0);
+      }
+    });
+  }
+  if(typeof vyntraSession!=='undefined'&&vyntraSession){loadProfile();loadRequests();}
+  setTimeout(patchServiceButtons,0);
+  const search=document.getElementById('countrySearch');
+  if(search)search.addEventListener('input',()=>setTimeout(patchServiceButtons,0));
+})();
