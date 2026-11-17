@@ -1,42 +1,129 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#090914">
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <title>Vyntra — Your Digital World</title>
 <style>
 :root{--bg:#080d1b;--panel:#101a2d;--panel2:#16243b;--line:#263752;--text:#f5f8ff;--muted:#9eacc4;--purple:#7868ff;--blue:#3e9bff;--green:#39d6ae;--red:#ff7185;--gold:#e8bd70}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 85% -10%,#263c70 0,transparent 32%),radial-gradient(ellipse at -10% 40%,#1b2450 0,transparent 28%),var(--bg);color:var(--text);font:15px/1.55 Inter,system-ui,-apple-system,Segoe UI,sans-serif;letter-spacing:.05px}
-button,input,select{font:inherit}button{cursor:pointer;border:0}.app{max-width:1280px;margin:auto;min-height:100vh;padding:26px 30px}
-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:30px;padding:0 2px}.brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:2.6px;font-size:23px}.logo{width:43px;height:43px;border-radius:14px;background:linear-gradient(145deg,#9a7cff,#4d8eff 70%,#48d7cb);display:grid;place-items:center;box-shadow:0 9px 28px #5f75ff55;font-size:22px;color:white}.tag{font-size:10px;letter-spacing:1.5px;color:#8799b8;font-weight:700;margin-top:1px}.header-right{display:flex;align-items:center;gap:12px}.pill{border:1px solid #344763;border-radius:99px;padding:8px 14px;color:#b8c5dc;font-size:11px;background:#142039}.avatar{width:39px;height:39px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#3b4e7b,#5a3d94);color:#fff;font-weight:800;border:1px solid #7185b3}
-.layout{display:grid;grid-template-columns:238px 1fr;gap:25px}.sidebar,.card{background:linear-gradient(155deg,rgba(19,31,53,.96),rgba(13,23,41,.98));border:1px solid var(--line);border-radius:21px;box-shadow:0 12px 35px #00000016}.sidebar{padding:16px;height:max-content;position:sticky;top:18px}.navlabel{color:#7285a5;font-size:10px;letter-spacing:1.8px;font-weight:850;padding:15px 11px 8px}.nav{width:100%;background:transparent;color:#a8b6ce;padding:12px 13px;border-radius:12px;text-align:left;display:flex;align-items:center;gap:13px;margin:3px 0;font-size:13px;font-weight:600;transition:.18s}.nav span:first-child{font-size:18px;width:22px;text-align:center}.nav.active,.nav:hover{background:linear-gradient(100deg,#6758df38,#318bdc20);color:white;box-shadow:inset 3px 0 #8b7cff}
-.main{min-width:0}.welcome{display:flex;justify-content:space-between;align-items:end;margin:2px 0 21px;gap:10px}.welcome h1{font-size:29px;margin:0 0 4px;letter-spacing:-.9px;font-weight:800}.welcome p{margin:0;color:var(--muted);font-size:13px}.demo{font-size:10px;letter-spacing:.8px;font-weight:800;background:#382d1b;color:#f4d18b;border:1px solid #71552c;padding:8px 12px;border-radius:99px;white-space:nowrap}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.card{padding:20px}.balance{grid-column:span 2;background:linear-gradient(118deg,#382a83 0%,#294b8e 58%,#176b83 100%);border:1px solid #6578c4;position:relative;overflow:hidden;min-height:185px;box-shadow:0 16px 40px #1e2d7040}.balance:after{content:"";position:absolute;width:250px;height:250px;border:1px solid #ffffff25;border-radius:50%;right:-55px;top:-115px;box-shadow:0 0 0 27px #ffffff09,0 0 0 60px #ffffff06}.eyebrow{font-size:12px;color:#d7ddff;font-weight:600}.amount{font-size:36px;font-weight:850;letter-spacing:-1.3px;margin:9px 0 17px}.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{padding:10px 15px;border-radius:11px;font-weight:750;font-size:12px;background:linear-gradient(120deg,#8976ff,#4d8fff);color:white;box-shadow:0 6px 18px #202d6a44;transition:.18s}.btn:hover{filter:brightness(1.12);transform:translateY(-1px)}.btn.secondary{background:#ffffff17;border:1px solid #ffffff3b;box-shadow:none}.btn.ghost{background:#1c2b47;color:#c9d7f0;box-shadow:none;border:1px solid #354a6b}
-.stat{display:flex;flex-direction:column;justify-content:center;min-height:185px;background:linear-gradient(145deg,#172744,#111c31)}.stat .label{color:#9baec9;font-size:12px}.stat .value{font-size:27px;font-weight:850;margin-top:7px;letter-spacing:-.5px}.stat .sub{color:var(--green);font-size:11px;margin-top:5px;font-weight:650}
-.section-head{display:flex;justify-content:space-between;align-items:center;margin:29px 0 13px}.section-head h2{font-size:17px;margin:0;letter-spacing:-.2px}.muted{color:var(--muted)}.service{min-height:143px;cursor:pointer;transition:.2s;position:relative;overflow:hidden}.service:hover{transform:translateY(-3px);border-color:#6678b7;box-shadow:0 14px 30px #0004}.service-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:21px;background:linear-gradient(145deg,#2d3c68,#282b58);border:1px solid #455681;margin-bottom:13px}.service h3{font-size:14px;margin:0 0 5px;font-weight:750}.service p{font-size:12px;color:#9eacc4;margin:0;line-height:1.5}.row{display:flex;justify-content:space-between;align-items:center;gap:12px}.list{display:grid;gap:10px}.item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;background:#ffffff05;border:1px solid #2a3a55;border-radius:13px}.item strong{font-size:13px}.item small{display:block;color:var(--muted);font-size:11px}.badge{font-size:10px;border-radius:99px;padding:5px 9px;background:#302c59;color:#d4caff;font-weight:700}.badge.green{background:#123b36;color:#75edc2}.badge.yellow{background:#45391f;color:#ffdc8b}
-.page{display:none}.page.active{display:block}.panel-title{font-size:26px;margin:0 0 4px;letter-spacing:-.7px}.page-intro{color:var(--muted);margin:0 0 20px;font-size:13px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.field{background:#0c1527;border:1px solid #30415f;color:white;border-radius:11px;padding:11px 13px;min-width:0;outline:none}.field:focus{border-color:#7c78ef;box-shadow:0 0 0 3px #7469f022}.toolbar .field{flex:1;min-width:150px}.country-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.country{background:linear-gradient(145deg,#172640,#111d32);border:1px solid #2c3e5b;border-radius:16px;padding:16px;transition:.18s}.country:hover{border-color:#6879b5;transform:translateY(-2px)}.country .flag{font-size:25px}.country h3{font-size:14px;margin:9px 0 3px}.country p{color:var(--muted);font-size:11px;margin:0 0 13px}.country .btn{width:100%;padding:9px}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 85% -10%,#263c70 0,transparent 32%),radial-gradient(ellipse at -10% 40%,#1b2450 0,transparent 28%),var(--bg);color:var(--text);font:15px/1.55 Inter,system-ui,-apple-system,Segoe UI,sans-serif;letter-spacing:.05px}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0}
+.app{max-width:1280px;margin:auto;min-height:100vh;padding:26px 30px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:30px;padding:0 2px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:2.6px;font-size:23px}
+.logo{width:43px;height:43px;border-radius:14px;background:linear-gradient(145deg,#9a7cff,#4d8eff 70%,#48d7cb);display:grid;place-items:center;box-shadow:0 9px 28px #5f75ff55;font-size:22px;color:white}
+.tag{font-size:10px;letter-spacing:1.5px;color:#8799b8;font-weight:700;margin-top:1px}
+.header-right{display:flex;align-items:center;gap:12px}
+.pill{border:1px solid #344763;border-radius:99px;padding:8px 14px;color:#b8c5dc;font-size:11px;background:#142039}
+.avatar{width:39px;height:39px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#3b4e7b,#5a3d94);color:#fff;font-weight:800;border:1px solid #7185b3}
+.layout{display:grid;grid-template-columns:238px 1fr;gap:25px}
+.sidebar,.card{background:linear-gradient(155deg,rgba(19,31,53,.96),rgba(13,23,41,.98));border:1px solid var(--line);border-radius:21px;box-shadow:0 12px 35px #00000016}
+.sidebar{padding:16px;height:max-content;position:sticky;top:18px}
+.navlabel{color:#7285a5;font-size:10px;letter-spacing:1.8px;font-weight:850;padding:15px 11px 8px}
+.nav{width:100%;background:transparent;color:#a8b6ce;padding:12px 13px;border-radius:12px;text-align:left;display:flex;align-items:center;gap:13px;margin:3px 0;font-size:13px;font-weight:600;transition:.18s}
+.nav span:first-child{font-size:18px;width:22px;text-align:center}
+.nav.active,.nav:hover{background:linear-gradient(100deg,#6758df38,#318bdc20);color:white;box-shadow:inset 3px 0 #8b7cff}
+.main{min-width:0}
+.welcome{display:flex;justify-content:space-between;align-items:end;margin:2px 0 21px;gap:10px}
+.welcome h1{font-size:29px;margin:0 0 4px;letter-spacing:-.9px;font-weight:800}
+.welcome p{margin:0;color:var(--muted);font-size:13px}
+.demo{font-size:10px;letter-spacing:.8px;font-weight:800;background:#123b36;color:#75edc2;border:1px solid #28685b;padding:8px 12px;border-radius:99px;white-space:nowrap}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.card{padding:20px}
+.balance{grid-column:span 2;background:linear-gradient(118deg,#382a83 0%,#294b8e 58%,#176b83 100%);border:1px solid #6578c4;position:relative;overflow:hidden;min-height:185px;box-shadow:0 16px 40px #1e2d7040}
+.balance:after{content:"";position:absolute;width:250px;height:250px;border:1px solid #ffffff25;border-radius:50%;right:-55px;top:-115px;box-shadow:0 0 0 27px #ffffff09,0 0 0 60px #ffffff06}
+.eyebrow{font-size:12px;color:#d7ddff;font-weight:600}
+.amount{font-size:36px;font-weight:850;letter-spacing:-1.3px;margin:9px 0 17px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{padding:10px 15px;border-radius:11px;font-weight:750;font-size:12px;background:linear-gradient(120deg,#8976ff,#4d8fff);color:white;box-shadow:0 6px 18px #202d6a44;transition:.18s}
+.btn:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.btn.secondary{background:#ffffff17;border:1px solid #ffffff3b;box-shadow:none}
+.btn.ghost{background:#1c2b47;color:#c9d7f0;box-shadow:none;border:1px solid #354a6b}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.stat{display:flex;flex-direction:column;justify-content:center;min-height:185px;background:linear-gradient(145deg,#172744,#111c31)}
+.stat .label{color:#9baec9;font-size:12px}
+.stat .value{font-size:27px;font-weight:850;margin-top:7px;letter-spacing:-.5px}
+.stat .sub{color:var(--green);font-size:11px;margin-top:5px;font-weight:650}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin:29px 0 13px}
+.section-head h2{font-size:17px;margin:0;letter-spacing:-.2px}
+.muted{color:var(--muted)}
+.service{min-height:143px;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.service:hover{transform:translateY(-3px);border-color:#6678b7;box-shadow:0 14px 30px #0004}
+.service-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:21px;background:linear-gradient(145deg,#2d3c68,#282b58);border:1px solid #455681;margin-bottom:13px}
+.service h3{font-size:14px;margin:0 0 5px;font-weight:750}
+.service p{font-size:12px;color:#9eacc4;margin:0;line-height:1.5}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.list{display:grid;gap:10px}
+.item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;background:#ffffff05;border:1px solid #2a3a55;border-radius:13px}
+.item strong{font-size:13px}
+.item small{display:block;color:var(--muted);font-size:11px}
+.badge{font-size:10px;border-radius:99px;padding:5px 9px;background:#302c59;color:#d4caff;font-weight:700}
+.badge.green{background:#123b36;color:#75edc2}
+.badge.yellow{background:#45391f;color:#ffdc8b}
+.page{display:none}
+.page.active{display:block}
+.panel-title{font-size:26px;margin:0 0 4px;letter-spacing:-.7px}
+.page-intro{color:var(--muted);margin:0 0 20px;font-size:13px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+.field{background:#0c1527;border:1px solid #30415f;color:white;border-radius:11px;padding:11px 13px;min-width:0;outline:none}
+.field:focus{border-color:#7c78ef;box-shadow:0 0 0 3px #7469f022}
+.toolbar .field{flex:1;min-width:150px}
+.country-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.country{background:linear-gradient(145deg,#172640,#111d32);border:1px solid #2c3e5b;border-radius:16px;padding:16px;transition:.18s}
+.country:hover{border-color:#6879b5;transform:translateY(-2px)}
+.country .flag{font-size:25px}
+.country h3{font-size:14px;margin:9px 0 3px}
+.country p{color:var(--muted);font-size:11px;margin:0 0 13px}
+.country .btn{width:100%;padding:9px}
 .notice{padding:14px 16px;border-radius:13px;background:#2b281e;border:1px solid #62532f;color:#f2dba7;font-size:12px;margin-bottom:16px}
-.wallets{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.wallet{padding:17px;border:1px solid #2b3d59;border-radius:16px;background:linear-gradient(145deg,#172640,#111d32)}.wallet .currency{color:#9eacc4;font-size:11px;font-weight:700;letter-spacing:.5px}.wallet strong{display:block;font-size:20px;margin-top:6px}.wallet small{color:var(--muted);font-size:11px}
-.table{width:100%;border-collapse:collapse;font-size:12px}.table th,.table td{text-align:left;padding:13px 9px;border-bottom:1px solid #293a55}.table th{color:#91a3c0;font-weight:700;letter-spacing:.5px;font-size:10px}.empty{text-align:center;color:var(--muted);padding:30px}
-.modalback{display:none;position:fixed;inset:0;background:#020713c9;backdrop-filter:blur(6px);z-index:10;align-items:center;justify-content:center;padding:18px}.modalback.show{display:flex}.modal{width:min(440px,100%);background:#14223a;border:1px solid #425779;border-radius:20px;padding:23px;box-shadow:0 20px 80px #000b}.modal h2{margin:0 0 5px}.modal p{color:var(--muted);font-size:13px;margin:0 0 16px}.modal input,.modal select{width:100%;margin:6px 0 12px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1c2d49;border:1px solid #566d94;color:white;padding:11px 16px;border-radius:12px;display:none;z-index:20;font-size:13px;box-shadow:0 10px 30px #0008}
+.wallets{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+.wallet{padding:17px;border:1px solid #2b3d59;border-radius:16px;background:linear-gradient(145deg,#172640,#111d32)}
+.wallet .currency{color:#9eacc4;font-size:11px;font-weight:700;letter-spacing:.5px}
+.wallet strong{display:block;font-size:20px;margin-top:6px}
+.wallet small{color:var(--muted);font-size:11px}
+.table{width:100%;border-collapse:collapse;font-size:12px}
+.table th,.table td{text-align:left;padding:13px 9px;border-bottom:1px solid #293a55}
+.table th{color:#91a3c0;font-weight:700;letter-spacing:.5px;font-size:10px}
+.empty{text-align:center;color:var(--muted);padding:30px}
+.modalback{display:none;position:fixed;inset:0;background:#020713c9;backdrop-filter:blur(6px);z-index:10;align-items:center;justify-content:center;padding:18px}
+.modalback.show{display:flex}
+.modal{width:min(440px,100%);background:#14223a;border:1px solid #425779;border-radius:20px;padding:23px;box-shadow:0 20px 80px #000b}
+.modal h2{margin:0 0 5px}
+.modal p{color:var(--muted);font-size:13px;margin:0 0 16px}
+.modal input,.modal select{width:100%;margin:6px 0 12px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1c2d49;border:1px solid #566d94;color:white;padding:11px 16px;border-radius:12px;display:none;z-index:60;font-size:13px;box-shadow:0 10px 30px #0008;max-width:90%;text-align:center}
 .mobilebar{display:none}
 footer{margin:30px 0 10px;text-align:center;color:#71829f;font-size:11px}
 @media(max-width:800px){.app{padding:17px 15px}.layout{grid-template-columns:1fr}.sidebar{display:none}.mobilebar{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:5;background:#0e192bed;backdrop-filter:blur(18px);border-top:1px solid #2b3c58;justify-content:space-around;padding:9px 3px calc(9px + env(safe-area-inset-bottom))}.mobilebar button{background:none;color:#9eacc4;font-size:10px;display:grid;gap:3px;justify-items:center}.mobilebar button span{font-size:18px}.mobilebar button.active{color:#b9aaff}.app{padding-bottom:95px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.balance{grid-column:span 2}.wallets{grid-template-columns:repeat(2,1fr)}.country-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.welcome h1{font-size:24px}.amount{font-size:31px}}
 @media(max-width:420px){.grid{gap:10px}.card{padding:15px}.country-grid{gap:9px}.country{padding:12px}.service{min-height:137px}.welcome{align-items:start;flex-direction:column}.pill{display:none}.header-right{gap:6px}}
-
 .authback{position:fixed;inset:0;z-index:50;background:rgba(3,7,18,.94);backdrop-filter:blur(14px);display:none;align-items:center;justify-content:center;padding:18px}
-.authback.show{display:flex}.authbox{width:min(440px,100%);background:linear-gradient(150deg,#172642,#101a2e);border:1px solid #40577b;border-radius:22px;padding:25px;box-shadow:0 25px 90px #000b}
-.authbrand{display:flex;align-items:center;gap:12px;margin-bottom:20px}.authbrand .logo{flex:none}.authbox h2{margin:0 0 5px;font-size:23px}.authbox p{color:#aab8d0;font-size:13px;margin:0 0 16px}
-.authbox label{display:block;color:#aab8d0;font-size:12px;margin:12px 0 5px}.authbox input{width:100%;background:#0b1427;border:1px solid #344967;border-radius:10px;color:white;padding:12px;outline:none}.authbox input:focus{border-color:#8175ff}
-.authbox .btn{width:100%;margin-top:14px;padding:12px}.authswitch{background:none;color:#b9adff;margin-top:12px;width:100%;font-size:12px}.authnote{font-size:11px!important;color:#f1d69b!important;background:#342d20;border:1px solid #65532d;padding:10px;border-radius:10px;margin-top:14px!important}
-.user-menu{display:flex;align-items:center;gap:8px}.user-email{font-size:11px;color:#aab8d0;max-width:180px;overflow:hidden;text-overflow:ellipsis}
-</style></head>
-<body><div class="app">
-<header><div class="brand"><div class="logo">V</div><div>VYNTRA<div class="tag">YOUR DIGITAL WORLD · ONE PLATFORM</div></div></div><div class="header-right"><div class="pill">● Demo environment</div><div class="avatar">U</div></div></header>
-<div class="layout">
+.authback.show{display:flex}
+.authbox{width:min(440px,100%);background:linear-gradient(150deg,#172642,#101a2e);border:1px solid #40577b;border-radius:22px;padding:25px;box-shadow:0 25px 90px #000b}
+.authbrand{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.authbrand .logo{flex:none}
+.authbox h2{margin:0 0 5px;font-size:23px}
+.authbox p{color:#aab8d0;font-size:13px;margin:0 0 16px}
+.authbox label{display:block;color:#aab8d0;font-size:12px;margin:12px 0 5px}
+.authbox input{width:100%;background:#0b1427;border:1px solid #344967;border-radius:10px;color:white;padding:12px;outline:none}
+.authbox input:focus{border-color:#8175ff}
+.authbox .btn{width:100%;margin-top:14px;padding:12px}
+.authswitch{background:none;color:#b9adff;margin-top:12px;width:100%;font-size:12px}
+.authnote{font-size:11px!important;color:#f1d69b!important;background:#342d20;border:1px solid #65532d;padding:10px;border-radius:10px;margin-top:14px!important}
+.user-menu{display:flex;align-items:center;gap:8px}
+.user-email{font-size:11px;color:#aab8d0;max-width:180px;overflow:hidden;text-overflow:ellipsis}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+<div class="brand"><div class="logo">V</div><div>VYNTRA<div class="tag">YOUR DIGITAL WORLD · ONE PLATFORM</div></div></div>
+<div class="header-right"><div class="pill">● Connecting...</div><div class="avatar">U</div></div>
+</header><div class="layout">
 <aside class="sidebar">
 <div class="navlabel">MENU</div>
 <button class="nav active" data-page="home"><span>⌂</span>Overview</button>
@@ -49,14 +136,20 @@ footer{margin:30px 0 10px;text-align:center;color:#71829f;font-size:11px}
 <button class="nav" data-page="activity"><span>↗</span>Transactions</button>
 <button class="nav" data-page="rewards"><span>♧</span>Rewards</button>
 <button class="nav" data-page="admin"><span>⚙</span>Admin preview</button>
-</aside>
-<main class="main">
+</aside><main class="main">
 <section id="home" class="page active">
-<div class="welcome"><div><h1>Welcome to Vyntra</h1><p>Your digital world, all in one place.</p></div><span class="demo">DEMO MODE · NO REAL MONEY</span></div>
+<div class="welcome">
+<div><h1>Welcome to Vyntra</h1><p>Your digital world, all in one place.</p></div>
+<span class="demo" id="accountStatus">ACCOUNT NOT CONNECTED</span>
+</div>
 <div class="grid">
-<div class="card balance"><div class="eyebrow">Demo wallet balance</div><div class="amount" id="homeBalance">₦250,000.00</div><div class="actions"><button class="btn" onclick="openModal('Add demo funds','Enter an amount to add to your simulated wallet. This is not real money.','add')">＋ Add funds</button><button class="btn secondary" onclick="go('wallet')">View wallet</button></div></div>
-<div class="card stat"><div class="label">Services</div><div class="value">05</div><div class="sub">Ready to explore</div></div>
-<div class="card stat"><div class="label">Demo transactions</div><div class="value" id="txCount">03</div><div class="sub">In this preview</div></div>
+<div class="card balance">
+<div class="eyebrow">Your NGN wallet balance</div>
+<div class="amount" id="homeBalance">₦0.00</div>
+<div class="actions"><button class="btn secondary" onclick="go('wallet')">View wallet</button></div>
+</div>
+<div class="card stat"><div class="label">Services</div><div class="value">05</div><div class="sub">Explore Vyntra</div></div>
+<div class="card stat"><div class="label">Transactions</div><div class="value" id="txCount">0</div><div class="sub">From your account</div></div>
 </div>
 <div class="section-head"><h2>Explore Vyntra</h2><span class="muted" style="font-size:11px">Choose a service</span></div>
 <div class="grid">
@@ -64,161 +157,550 @@ footer{margin:30px 0 10px;text-align:center;color:#71829f;font-size:11px}
 <div class="card service" onclick="go('accounts')"><div class="service-icon">🌍</div><h3>Global Accounts</h3><p>USD, GBP and EUR account options.</p></div>
 <div class="card service" onclick="go('crypto')"><div class="service-icon">₿</div><h3>Crypto</h3><p>Explore supported digital assets.</p></div>
 <div class="card service" onclick="go('giftcards')"><div class="service-icon">🎁</div><h3>Gift Cards</h3><p>Buy or sell supported gift cards.</p></div>
-<div class="card service" onclick="go('wallet')"><div class="service-icon">👛</div><h3>Multi-currency Wallet</h3><p>View demo currency balances.</p></div>
+<div class="card service" onclick="go('wallet')"><div class="service-icon">👛</div><h3>Multi-currency Wallet</h3><p>View your wallet balances.</p></div>
 <div class="card service" onclick="go('rewards')"><div class="service-icon">🤝</div><h3>Rewards</h3><p>Referral programme preview.</p></div>
 </div>
-<div class="section-head"><h2>Recent activity</h2><button class="btn ghost" onclick="go('activity')">View all</button></div><div class="card list" id="recentList"></div>
-</section>
-<section id="numbers" class="page"><h1 class="panel-title">Virtual numbers</h1><p class="page-intro">Browse country availability. Live numbers and SMS delivery require an approved telecom provider.</p><div class="notice">Preview only: no real phone numbers are being rented and no verification messages can be received in this demo.</div><div class="toolbar"><input class="field" id="countrySearch" placeholder="Search country…" oninput="filterCountries()"><select class="field" id="numberType"><option>SMS reception</option><option>Voice capable (subject to provider)</option></select></div><div class="country-grid" id="countryGrid"></div></section>
-<section id="accounts" class="page"><h1 class="panel-title">Vyntra Global Accounts</h1><p class="page-intro">Explore the international account experience planned for eligible customers.</p><div class="notice">Demo only: these are not bank accounts. Real USD, GBP and EUR accounts require an approved banking partner, eligibility checks and identity verification.</div><div class="country-grid">
+<div class="section-head"><h2>Recent activity</h2><button class="btn ghost" onclick="go('activity')">View all</button></div>
+<div class="card list" id="recentList"><div class="empty">Sign in to view your transactions.</div></div>
+</section><section id="numbers" class="page">
+<h1 class="panel-title">Virtual numbers</h1>
+<p class="page-intro">Browse country availability. Live numbers and SMS delivery require an approved telecom provider.</p>
+<div class="notice">Preview only: no real phone numbers are being rented and no verification messages can be received yet.</div>
+<div class="toolbar"><input class="field" id="countrySearch" placeholder="Search country…" oninput="filterCountries()"><select class="field" id="numberType"><option>SMS reception</option><option>Voice capable (subject to provider)</option></select></div>
+<div class="country-grid" id="countryGrid"></div>
+</section><section id="accounts" class="page">
+<h1 class="panel-title">Vyntra Global Accounts</h1>
+<p class="page-intro">Explore the international account experience planned for eligible customers.</p>
+<div class="notice">These are not bank accounts. Real USD, GBP and EUR accounts require an approved banking partner, eligibility checks and identity verification.</div>
+<div class="country-grid">
 <div class="country"><div class="flag">🇺🇸</div><h3>United States · USD</h3><p>Potential ACH account details</p><button class="btn" onclick="accountInfo('USD','United States')">Explore account</button></div>
 <div class="country"><div class="flag">🇬🇧</div><h3>United Kingdom · GBP</h3><p>Potential local GBP details</p><button class="btn" onclick="accountInfo('GBP','United Kingdom')">Explore account</button></div>
 <div class="country"><div class="flag">🇪🇺</div><h3>Eurozone · EUR</h3><p>Potential SEPA IBAN</p><button class="btn" onclick="accountInfo('EUR','Eurozone')">Explore account</button></div>
 <div class="country"><div class="flag">🇨🇦</div><h3>Canada · CAD</h3><p>Subject to partner coverage</p><button class="btn" onclick="accountInfo('CAD','Canada')">Explore account</button></div>
 <div class="country"><div class="flag">🇦🇪</div><h3>UAE · AED</h3><p>Subject to partner coverage</p><button class="btn" onclick="accountInfo('AED','United Arab Emirates')">Explore account</button></div>
 <div class="country"><div class="flag">🇳🇬</div><h3>Nigeria · NGN</h3><p>Local account options</p><button class="btn" onclick="accountInfo('NGN','Nigeria')">Explore account</button></div>
-</div></section>
-<section id="crypto" class="page"><h1 class="panel-title">Crypto marketplace</h1><p class="page-intro">A preview of the digital assets Vyntra may support through an authorised partner.</p><div class="notice">Demo only: prices and trade actions are simulated. No cryptocurrency is bought, sold, held or transferred.</div><div class="list" id="cryptoList"></div></section>
-<section id="giftcards" class="page"><h1 class="panel-title">Gift cards</h1><p class="page-intro">Explore gift-card categories planned for Vyntra.</p><div class="notice">Demo only: no gift cards are available for purchase or redemption yet. Supplier approval, fraud checks and resale rights are required.</div><div class="country-grid" id="giftGrid"></div></section>
-<section id="wallet" class="page"><h1 class="panel-title">My wallet</h1><p class="page-intro">Simulated balances for testing the Vyntra interface.</p><div class="notice">All balances shown here are fictional demo values and cannot be withdrawn or transferred.</div><div class="wallets" id="walletGrid"></div><div class="section-head"><h2>Wallet actions</h2></div><div class="card actions"><button class="btn" onclick="openModal('Add demo funds','Enter an amount to add to your simulated NGN wallet.','add')">＋ Add demo funds</button><button class="btn ghost" onclick="openModal('Withdraw preview','Real withdrawals are not enabled in this demo.','info')">Withdraw</button><button class="btn ghost" onclick="go('activity')">Transaction history</button></div></section>
-<section id="activity" class="page"><h1 class="panel-title">Transactions</h1><p class="page-intro">Your simulated activity in this preview.</p><div class="card" style="overflow:auto"><table class="table"><thead><tr><th>DESCRIPTION</th><th>DATE</th><th>STATUS</th><th>AMOUNT</th></tr></thead><tbody id="txTable"></tbody></table></div></section>
-<section id="rewards" class="page"><h1 class="panel-title">Vyntra Rewards</h1><p class="page-intro">A preview of our future referral programme.</p><div class="card"><div class="eyebrow">Your demo referral code</div><div class="amount" style="font-size:27px">VYNTRA-DEMO</div><button class="btn" onclick="copyCode()">Copy referral code</button><p class="muted" style="font-size:12px;margin:15px 0 0">Referral rewards will only be paid under published programme terms after partner services are live. No cash rewards are active in this preview.</p></div></section>
-<section id="admin" class="page"><h1 class="panel-title">Admin preview</h1><p class="page-intro">A sample view of future platform controls. This is not a secure production admin console.</p><div class="notice">Demo preview only. Production admin access must use secure authentication, role permissions and audit logs.</div><div class="grid"><div class="card stat"><div class="label">Demo users</div><div class="value">1</div></div><div class="card stat"><div class="label">Connected providers</div><div class="value">0</div></div><div class="card stat"><div class="label">Live services</div><div class="value">0</div></div></div><div class="section-head"><h2>Provider integrations</h2></div><div class="list"><div class="item"><div><strong>Telecom / SMS provider</strong><small>API integration not connected</small></div><span class="badge yellow">Not connected</span></div><div class="item"><div><strong>Banking / virtual accounts</strong><small>Partner onboarding required</small></div><span class="badge yellow">Not connected</span></div><div class="item"><div><strong>Crypto / fiat provider</strong><small>Partner onboarding and compliance required</small></div><span class="badge yellow">Not connected</span></div><div class="item"><div><strong>Gift card supplier</strong><small>Inventory and buyback partner required</small></div><span class="badge yellow">Not connected</span></div><div class="item"><div><strong>Payment gateway</strong><small>Merchant onboarding required</small></div><span class="badge yellow">Not connected</span></div></div></section>
-</main></div>
-<footer>VYNTRA © 2026 · Demo prototype · Not a bank, exchange or telecom operator.</footer>
 </div>
-<nav class="mobilebar">
-<button class="active" data-page="home"><span>⌂</span>Home</button><button data-page="numbers"><span>▣</span>Numbers</button><button data-page="accounts"><span>◎</span>Accounts</button><button data-page="crypto"><span>₿</span>Crypto</button><button data-page="giftcards"><span>🎁</span>Gift cards</button><button data-page="wallet"><span>◈</span>Wallet</button>
-</nav>
-<div class="modalback" id="modalback" onclick="if(event.target===this)closeModal()"><div class="modal"><h2 id="modalTitle">Title</h2><p id="modalText"></p><div id="modalFields"></div><div class="modal-actions"><button class="btn secondary" onclick="closeModal()">Close</button><button class="btn" id="modalConfirm" onclick="confirmModal()">Continue</button></div></div></div>
-<div class="toast" id="toast"></div>
-
-<div class="authback" id="authback">
- <div class="authbox">
-  <div class="authbrand"><div class="logo">V</div><div><strong>VYNTRA</strong><div class="tag">YOUR DIGITAL WORLD · ONE PLATFORM</div></div></div>
-  <h2 id="authTitle">Welcome back</h2><p id="authSubtitle">Sign in to access your Vyntra account.</p>
-  <div id="authNameWrap" style="display:none"><label>Full name</label><input id="authName" autocomplete="name" placeholder="Your full name"></div>
-  <label>Email address</label><input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com">
-  <label>Password</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="At least 8 characters">
-  <button class="btn" id="authSubmit">Sign in</button>
-  <button class="authswitch" id="authSwitch">New to Vyntra? Create an account</button>
-  <p class="authnote" id="authNotice">Authentication is not configured yet. Demo mode remains available until you connect your own Supabase project.</p>
- </div>
+</section><section id="crypto" class="page">
+<h1 class="panel-title">Crypto marketplace</h1>
+<p class="page-intro">A preview of the digital assets Vyntra may support through an authorised partner.</p>
+<div class="notice">Prices and trade actions are illustrative. No cryptocurrency is bought, sold, held or transferred yet.</div>
+<div class="list" id="cryptoList"></div>
+</section><section id="giftcards" class="page">
+<h1 class="panel-title">Gift cards</h1>
+<p class="page-intro">Explore gift-card categories planned for Vyntra.</p>
+<div class="notice">No gift cards are available for purchase or redemption yet. Supplier approval, fraud checks and resale rights are required.</div>
+<div class="country-grid" id="giftGrid"></div>
+</section><section id="wallet" class="page">
+<h1 class="panel-title">My wallet</h1>
+<p class="page-intro">Your balances are loaded from your Vyntra account database.</p>
+<div class="notice" id="walletNotice">Sign in to load your wallet balances. Balances are not editable from this app.</div>
+<div class="wallets" id="walletGrid">
+<div class="wallet"><div class="currency">NGN · Naira</div><strong>₦0.00</strong><small>Waiting for account</small></div>
+<div class="wallet"><div class="currency">USD · US dollar</div><strong>$0.00</strong><small>Waiting for account</small></div>
+<div class="wallet"><div class="currency">GBP · Pound sterling</div><strong>£0.00</strong><small>Waiting for account</small></div>
+<div class="wallet"><div class="currency">EUR · Euro</div><strong>€0.00</strong><small>Waiting for account</small></div>
 </div>
+<div class="section-head"><h2>Wallet actions</h2></div>
+<div class="card actions">
+<button class="btn ghost" onclick="toast('Deposits will be enabled after payment provider integration.')">Deposit</button>
+<button class="btn ghost" onclick="toast('Withdrawals are not enabled yet.')">Withdraw</button>
+<button class="btn ghost" onclick="go('activity')">Transaction history</button>
+</div>
+</section><section id="activity" class="page">
+<h1 class="panel-title">Transactions</h1>
+<p class="page-intro">Transaction records belonging to your signed-in account.</p>
+<div class="card" style="overflow:auto">
+<table class="table">
+<thead><tr><th>DESCRIPTION</th><th>DATE</th><th>STATUS</th><th>AMOUNT</th></tr></thead>
+<tbody id="txTable"><tr><td colspan="4" class="empty">Sign in to view transactions.</td></tr></tbody>
+</table>
+</div>
+</section><section id="rewards" class="page">
+<h1 class="panel-title">Vyntra Rewards</h1>
+<p class="page-intro">A preview of our future referral programme.</p>
+<div class="card">
+<div class="eyebrow">Referral programme</div>
+<div class="amount" style="font-size:27px">Coming soon</div>
+<p class="muted" style="font-size:12px;margin:15px 0 0">Referral rewards will only be paid under published programme terms after partner services are live.</p>
+</div>
+</section><section id="admin" class="page">
+<h1 class="panel-title">Admin preview</h1>
+<p class="page-intro">A sample view of future platform controls. This is not a secure production admin console.</p>
+<div class="notice">Production admin access must use secure authentication, role permissions and audit logs.</div>
+<div class="grid">
+<div class="card stat"><div class="label">Connected database</div><div class="value">1</div><div class="sub">Supabase authentication</div></div>
+<div class="card stat"><div class="label">Connected providers</div><div class="value">0</div></div>
+<div class="card stat"><div class="label">Live services</div><div class="value">0</div></div>
+</div>
+<div class="section-head"><h2>Provider integrations</h2></div>
+<div class="list">
+<div class="item"><div><strong>Telecom / SMS provider</strong><small>API integration not connected</small></div><span class="badge yellow">Not connected</span></div>
+<div class="item"><div><strong>Banking / virtual accounts</strong><small>Partner onboarding required</small></div><span class="badge yellow">Not connected</span></div>
+<div class="item"><div><strong>Crypto / fiat provider</strong><small>Partner onboarding and compliance required</small></div><span class="badge yellow">Not connected</span></div>
+<div class="item"><div><strong>Gift card supplier</strong><small>Inventory and buyback partner required</small></div><span class="badge yellow">Not connected</span></div>
+<div class="item"><div><strong>Payment gateway</strong><small>Merchant onboarding required</small></div><span class="badge yellow">Not connected</span></div>
+</div>
+</section>
+</main>
+</div><footer>VYNTRA © 2026 · Wallet data secured by Supabase · Financial services subject to provider integration and approval.</footer>
+</div><nav class="mobilebar">
+<button class="active" data-page="home"><span>⌂</span>Home</button>
+<button data-page="numbers"><span>▣</span>Numbers</button>
+<button data-page="accounts"><span>◎</span>Accounts</button>
+<button data-page="crypto"><span>₿</span>Crypto</button>
+<button data-page="giftcards"><span>🎁</span>Gift cards</button>
+<button data-page="wallet"><span>◈</span>Wallet</button>
+</nav><div class="modalback" id="modalback" onclick="if(event.target===this)closeModal()">
+<div class="modal">
+<h2 id="modalTitle">Title</h2>
+<p id="modalText"></p>
+<div id="modalFields"></div>
+<div class="modal-actions">
+<button class="btn secondary" onclick="closeModal()">Close</button>
+<button class="btn" id="modalConfirm" onclick="closeModal()">Continue</button>
+</div>
+</div>
+</div><div class="toast" id="toast"></div><div class="authback" id="authback">
+<div class="authbox">
+<div class="authbrand"><div class="logo">V</div><div><strong>VYNTRA</strong><div class="tag">YOUR DIGITAL WORLD · ONE PLATFORM</div></div></div>
+<h2 id="authTitle">Welcome back</h2>
+<p id="authSubtitle">Sign in to access your Vyntra account.</p>
+<div id="authNameWrap" style="display:none"><label>Full name</label><input id="authName" autocomplete="name" placeholder="Your full name"></div>
+<label>Email address</label><input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com">
+<label>Password</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="At least 8 characters">
+<button class="btn" id="authSubmit">Sign in</button>
+<button class="authswitch" id="authSwitch">New to Vyntra? Create an account</button>
+<p class="authnote" id="authNotice">Connect to your Vyntra account.</p>
+</div>
+</div><script>
+/* VYNTRA APPLICATION */
+const countries=[
+['🇺🇸','United States','USD'],['🇬🇧','United Kingdom','GBP'],['🇨🇦','Canada','CAD'],
+['🇩🇪','Germany','EUR'],['🇫🇷','France','EUR'],['🇳🇱','Netherlands','EUR'],
+['🇮🇪','Ireland','EUR'],['🇳🇬','Nigeria','NGN'],['🇮🇳','India','INR'],
+['🇦🇺','Australia','AUD'],['🇿🇦','South Africa','ZAR'],['🇪🇸','Spain','EUR']
+];
+const assets=[
+['₿','Bitcoin','BTC','$67,420.00'],['◆','Ethereum','ETH','$3,510.20'],
+['₮','Tether','USDT','$1.00'],['◎','USD Coin','USDC','$1.00']
+];
+const cards=[
+['🛍️','Amazon'],['','Apple'],['▶','Google Play'],['🎮','Steam'],
+['🎮','PlayStation'],['🟩','Xbox'],['🏬','Walmart'],['⚡','Razer Gold']
+];
 
-<script>
-const countries=[['🇺🇸','United States','USD'],['🇬🇧','United Kingdom','GBP'],['🇨🇦','Canada','CAD'],['🇩🇪','Germany','EUR'],['🇫🇷','France','EUR'],['🇳🇱','Netherlands','EUR'],['🇮🇪','Ireland','EUR'],['🇳🇬','Nigeria','NGN'],['🇮🇳','India','INR'],['🇦🇺','Australia','AUD'],['🇿🇦','South Africa','ZAR'],['🇪🇸','Spain','EUR']];
-const assets=[['₿','Bitcoin','BTC','$67,420.00'],['◆','Ethereum','ETH','$3,510.20'],['₮','Tether','USDT','$1.00'],['◎','USD Coin','USDC','$1.00']];
-const cards=[['🛍️','Amazon'],['','Apple'],['▶','Google Play'],['🎮','Steam'],['🎮','PlayStation'],['🟩','Xbox'],['🏬','Walmart'],['⚡','Razer Gold']];
-let balance=250000, transactions=[{name:'Welcome demo credit',date:'Today',status:'Demo',amount:'+₦250,000.00'},{name:'Vyntra account created',date:'Today',status:'Demo',amount:'—'},{name:'Referral preview',date:'Today',status:'Demo',amount:'—'}],modalAction=null;
-function money(n){return '₦'+n.toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2})}
-function go(page){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===page));document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===page));window.scrollTo({top:0,behavior:'smooth'});if(page==='activity')renderTransactions()}
-document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
-function renderCountries(q=''){document.getElementById('countryGrid').innerHTML=countries.filter(c=>c[1].toLowerCase().includes(q.toLowerCase())).map(c=>`<div class="country"><div class="flag">${c[0]}</div><h3>${c[1]}</h3><p>${c[2]} · Availability depends on provider</p><button class="btn" onclick="toast('Live number rental is not connected yet.')">Check availability</button></div>`).join('')}
-function filterCountries(){renderCountries(document.getElementById('countrySearch').value)}
-function renderCrypto(){document.getElementById('cryptoList').innerHTML=assets.map(a=>`<div class="item"><div class="row"><div class="service-icon" style="margin:0;width:38px;height:38px">${a[0]}</div><div><strong>${a[1]} (${a[2]})</strong><small>Indicative demo price</small></div></div><div style="text-align:right"><strong>${a[3]}</strong><small><button class="btn ghost" style="padding:6px 10px;margin-top:5px" onclick="toast('Trading will be enabled after partner integration.')">Trade</button></small></div></div>`).join('')}
-function renderGifts(){document.getElementById('giftGrid').innerHTML=cards.map(c=>`<div class="country"><div class="flag">${c[0]}</div><h3>${c[1]} Gift Card</h3><p>Buyback and stock subject to supplier</p><div class="actions"><button class="btn" onclick="toast('Gift card purchasing is not connected yet.')">Buy</button><button class="btn ghost" onclick="toast('Gift card selling is not connected yet.')">Sell</button></div></div>`).join('')}
-function renderWallet(){document.getElementById('walletGrid').innerHTML=[['NGN',money(balance),'Naira'],['USD','$0.00','US dollar'],['GBP','£0.00','Pound sterling'],['EUR','€0.00','Euro']].map(w=>`<div class="wallet"><div class="currency">${w[0]} · ${w[2]}</div><strong>${w[1]}</strong><small>Demo balance</small></div>`).join('');document.getElementById('homeBalance').textContent=money(balance);document.getElementById('txCount').textContent=String(transactions.length).padStart(2,'0')}
-function renderTransactions(){document.getElementById('txTable').innerHTML=transactions.map(t=>`<tr><td>${t.name}</td><td>${t.date}</td><td><span class="badge">${t.status}</span></td><td>${t.amount}</td></tr>`).join('')}
-function renderRecent(){document.getElementById('recentList').innerHTML=transactions.slice(0,3).map(t=>`<div class="item"><div><strong>${t.name}</strong><small>${t.date}</small></div><span class="badge">${t.status}</span><strong>${t.amount}</strong></div>`).join('')}
-function toast(msg){let t=document.getElementById('toast');t.textContent=msg;t.style.display='block';clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.style.display='none',2800)}
-function openModal(title,desc,action){modalAction=action;document.getElementById('modalTitle').textContent=title;document.getElementById('modalText').textContent=desc;document.getElementById('modalFields').innerHTML=action==='add'?'<label class="muted" style="font-size:12px">Amount in NGN</label><input class="field" id="addAmount" type="number" min="1" placeholder="e.g. 5000">':'';document.getElementById('modalConfirm').style.display=action==='info'?'none':'inline-block';document.getElementById('modalback').classList.add('show')}
-function closeModal(){document.getElementById('modalback').classList.remove('show')}
-function confirmModal(){if(modalAction==='add'){let n=Number(document.getElementById('addAmount').value);if(!Number.isFinite(n)||n<=0||n>100000000){toast('Enter a valid amount.');return}balance+=n;transactions.unshift({name:'Demo wallet top-up',date:'Just now',status:'Demo',amount:'+'+money(n)});renderWallet();renderRecent();toast('Demo funds added. No real payment was made.')}closeModal()}
-function accountInfo(currency,country){document.getElementById('modalTitle').textContent=country+' · '+currency;document.getElementById('modalText').textContent='Vyntra plans to offer eligible customers a receiving account through a regulated banking partner. No account can be issued in this prototype. Real availability, supported payment rails, fees and eligibility will be confirmed by the partner.';document.getElementById('modalFields').innerHTML='<div class="item"><div><strong>Account status</strong><small>Partner integration pending</small></div><span class="badge yellow">Coming later</span></div>';document.getElementById('modalConfirm').style.display='none';document.getElementById('modalback').classList.add('show')}
-function copyCode(){if(navigator.clipboard){navigator.clipboard.writeText('VYNTRA-DEMO').then(()=>toast('Demo referral code copied.')).catch(()=>toast('Your code is VYNTRA-DEMO'))}else toast('Your code is VYNTRA-DEMO')}
-renderCountries();renderCrypto();renderGifts();renderWallet();renderRecent();renderTransactions();
+let modalAction=null;
+let vyntraSupabase=null;
+let vyntraAuthMode='login';
+let vyntraSession=null;
+let walletRecords=[];
+let transactionRecords=[];
+let walletLoadError=null;
 
-// VYNTRA AUTH FOUNDATION — Supabase client uses only the public anon key in the browser.
-// Never place a Supabase service_role key or provider secret in this file.
-let vyntraSupabase = null, vyntraAuthMode = 'login', vyntraSession = null;
-const authConfigured = !!(window.VYNTRA_SUPABASE_URL && window.VYNTRA_SUPABASE_ANON_KEY &&
-  !String(window.VYNTRA_SUPABASE_URL).includes('YOUR_') &&
-  !String(window.VYNTRA_SUPABASE_ANON_KEY).includes('YOUR_'));
-function authUi(show, title, subtitle, notice) {
-  document.getElementById('authback').classList.toggle('show', !!show);
-  if (title) document.getElementById('authTitle').textContent = title;
-  if (subtitle) document.getElementById('authSubtitle').textContent = subtitle;
-  if (notice !== undefined) document.getElementById('authNotice').textContent = notice;
-}
-function setAuthMode(mode) {
-  vyntraAuthMode = mode;
-  const signup = mode === 'signup';
-  document.getElementById('authTitle').textContent = signup ? 'Create your account' : 'Welcome back';
-  document.getElementById('authSubtitle').textContent = signup ? 'Join Vyntra using your email address.' : 'Sign in to access your Vyntra account.';
-  document.getElementById('authNameWrap').style.display = signup ? 'block' : 'none';
-  document.getElementById('authSubmit').textContent = signup ? 'Create account' : 'Sign in';
-  document.getElementById('authSwitch').textContent = signup ? 'Already registered? Sign in' : 'New to Vyntra? Create an account';
-  document.getElementById('authPassword').autocomplete = signup ? 'new-password' : 'current-password';
-}
-document.getElementById('authSwitch').addEventListener('click', () => setAuthMode(vyntraAuthMode === 'login' ? 'signup' : 'login'));
-function showUserSession(session) {
-  vyntraSession = session;
-  const email = session?.user?.email || '';
-  const avatar = document.querySelector('.avatar');
-  if (avatar) avatar.textContent = email ? email[0].toUpperCase() : 'U';
-  const pill = document.querySelector('.header-right .pill');
-  if (pill) pill.textContent = authConfigured ? '● Secure account' : '● Demo environment';
-  let old = document.getElementById('vyntraSignOut');
-  if (old) old.remove();
-  if (authConfigured && email) {
-    const b = document.createElement('button');
-    b.id = 'vyntraSignOut'; b.className = 'btn ghost'; b.style.padding = '8px 10px';
-    b.textContent = 'Sign out'; b.onclick = async () => {
-      const {error} = await vyntraSupabase.auth.signOut();
-      if (error) toast(error.message); else { vyntraSession = null; authUi(true); }
-    };
-    document.querySelector('.header-right').appendChild(b);
-  }
-}
-async function submitVyntraAuth() {
-  if (!authConfigured || !vyntraSupabase) {
-    authUi(true, 'Connect Vyntra authentication', 'One-time setup is needed before real user accounts can be created.',
-      'Open config.js and add your Supabase project URL and public anon key. Never use a service_role key here.');
-    return;
-  }
-  const email = document.getElementById('authEmail').value.trim();
-  const password = document.getElementById('authPassword').value;
-  const fullName = document.getElementById('authName').value.trim();
-  if (!email || password.length < 8) { toast('Enter a valid email and a password of at least 8 characters.'); return; }
-  const button = document.getElementById('authSubmit'); button.disabled = true; button.textContent = 'Please wait…';
-  try {
-    let result;
-    if (vyntraAuthMode === 'signup') {
-      result = await vyntraSupabase.auth.signUp({email, password, options:{data:{full_name:fullName}}});
-      if (!result.error && !result.data.session) {
-        authUi(true, 'Check your email', 'Confirm your email address, then return here to sign in.',
-          'Supabase email confirmation is enabled. Check your inbox for the confirmation message.');
-        setAuthMode('login');
-      }
-    } else {
-      result = await vyntraSupabase.auth.signInWithPassword({email, password});
-    }
-    if (result.error) toast(result.error.message);
-    else if (result.data.session) { showUserSession(result.data.session); authUi(false); toast('You are signed in.'); }
-  } catch(e) { toast('Authentication error: ' + e.message); }
-  finally { button.disabled = false; button.textContent = vyntraAuthMode === 'signup' ? 'Create account' : 'Sign in'; }
-}
-document.getElementById('authSubmit').addEventListener('click', submitVyntraAuth);
-document.getElementById('authPassword').addEventListener('keydown', e => { if (e.key === 'Enter') submitVyntraAuth(); });
-if (authConfigured && window.supabase?.createClient) {
-  vyntraSupabase = window.supabase.createClient(window.VYNTRA_SUPABASE_URL, window.VYNTRA_SUPABASE_ANON_KEY);
-  vyntraSupabase.auth.getSession().then(({data}) => {
-    if (data.session) { showUserSession(data.session); authUi(false); }
-    else authUi(true);
-  });
-  vyntraSupabase.auth.onAuthStateChange((_event, session) => {
-    if (session) { showUserSession(session); authUi(false); }
-    else if (!vyntraSession) authUi(true);
-  });
-} else {
-  // Keep the current demo usable without a backend. Real account creation is intentionally unavailable.
-  document.getElementById('authNotice').textContent =
-    'Demo mode: configure Supabase in config.js to enable real sign-up and sign-in. Demo balances and transactions are not real.';
-  document.getElementById('authSubmit').textContent = 'Set up authentication';
-  document.getElementById('authSubmit').onclick = () => authUi(true, 'Authentication setup required',
-    'Add your Supabase project details to config.js, then reload this app.',
-    'Do not paste private provider keys or a Supabase service_role key into the browser.');
+const currencyInfo={
+NGN:{symbol:'₦',name:'Naira',locale:'en-NG'},
+USD:{symbol:'$',name:'US dollar',locale:'en-US'},
+GBP:{symbol:'£',name:'Pound sterling',locale:'en-GB'},
+EUR:{symbol:'€',name:'Euro',locale:'de-DE'}
+};
+
+function money(amount,currency='NGN'){
+const info=currencyInfo[currency]||{symbol:currency+' ',locale:'en-US'};
+const n=Number(amount||0);
+return info.symbol+n.toLocaleString(info.locale,{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 
-</script></body></html>
+function escapeHTML(value){
+return String(value??'').replace(/[&<>"']/g,char=>({
+'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+}[char]));
+}
+
+function go(page){
+document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===page));
+document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+window.scrollTo({top:0,behavior:'smooth'});
+if(page==='activity')renderTransactions();
+if(page==='wallet'&&vyntraSession)loadWalletData();
+}
+
+document.querySelectorAll('[data-page]').forEach(b=>{
+b.addEventListener('click',()=>go(b.dataset.page));
+});
+
+function renderCountries(q=''){
+document.getElementById('countryGrid').innerHTML=countries
+.filter(c=>c[1].toLowerCase().includes(q.toLowerCase()))
+.map(c=>`<div class="country">
+<div class="flag">${c[0]}</div><h3>${c[1]}</h3>
+<p>${c[2]} · Availability depends on provider</p>
+<button class="btn" onclick="toast('Live number rental is not connected yet.')">Check availability</button>
+</div>`).join('');
+}
+
+function filterCountries(){
+renderCountries(document.getElementById('countrySearch').value);
+}
+
+function renderCrypto(){
+document.getElementById('cryptoList').innerHTML=assets.map(a=>`
+<div class="item">
+<div class="row">
+<div class="service-icon" style="margin:0;width:38px;height:38px">${a[0]}</div>
+<div><strong>${a[1]} (${a[2]})</strong><small>Illustrative reference price</small></div>
+</div>
+<div style="text-align:right"><strong>${a[3]}</strong>
+<small><button class="btn ghost" style="padding:6px 10px;margin-top:5px" onclick="toast('Trading requires a provider integration.')">Trade</button></small></div>
+</div>`).join('');
+}
+
+function renderGifts(){
+document.getElementById('giftGrid').innerHTML=cards.map(c=>`
+<div class="country">
+<div class="flag">${c[0]}</div><h3>${c[1]} Gift Card</h3>
+<p>Buyback and stock subject to supplier</p>
+<div class="actions">
+<button class="btn" onclick="toast('Gift card purchasing is not connected yet.')">Buy</button>
+<button class="btn ghost" onclick="toast('Gift card selling is not connected yet.')">Sell</button>
+</div></div>`).join('');
+}
+
+function toast(msg){
+const t=document.getElementById('toast');
+t.textContent=msg;
+t.style.display='block';
+clearTimeout(window.toastTimer);
+window.toastTimer=setTimeout(()=>t.style.display='none',3500);
+}
+
+function openModal(title,desc){
+document.getElementById('modalTitle').textContent=title;
+document.getElementById('modalText').textContent=desc;
+document.getElementById('modalFields').innerHTML='';
+document.getElementById('modalback').classList.add('show');
+}
+
+function closeModal(){
+document.getElementById('modalback').classList.remove('show');
+}
+
+function accountInfo(currency,country){
+openModal(country+' · '+currency,
+'Vyntra plans to offer eligible customers a receiving account through a regulated banking partner. No account can be issued yet. Availability, supported payment rails, fees and eligibility will be confirmed by the partner.');
+}
+
+function renderWallet(){
+const currencies=['NGN','USD','GBP','EUR'];
+const grid=document.getElementById('walletGrid');
+
+grid.innerHTML=currencies.map(currency=>{
+const record=walletRecords.find(w=>w.currency===currency);
+const amount=record?money(record.balance,currency):money(0,currency);
+const status=record?record.status:'Not created';
+return `<div class="wallet">
+<div class="currency">${currency} · ${currencyInfo[currency].name}</div>
+<strong>${amount}</strong>
+<small>${escapeHTML(status)}</small>
+</div>`;
+}).join('');
+
+const ngn=walletRecords.find(w=>w.currency==='NGN');
+document.getElementById('homeBalance').textContent=ngn?money(ngn.balance,'NGN'):'₦0.00';
+document.getElementById('txCount').textContent=String(transactionRecords.length);
+}
+
+function statusClass(status){
+if(status==='successful')return 'green';
+if(status==='pending'||status==='processing')return 'yellow';
+return '';
+}
+
+function formatDate(value){
+if(!value)return '—';
+const date=new Date(value);
+if(Number.isNaN(date.getTime()))return '—';
+return date.toLocaleString();
+}
+
+function transactionAmount(t){
+const sign=['deposit','refund'].includes(t.type)?'+':
+['withdrawal','purchase'].includes(t.type)?'−':'';
+return sign+money(t.amount,t.currency);
+}
+
+function renderTransactions(){
+const body=document.getElementById('txTable');
+
+if(!vyntraSession){
+body.innerHTML='<tr><td colspan="4" class="empty">Sign in to view your transactions.</td></tr>';
+return;
+}
+if(walletLoadError){
+body.innerHTML='<tr><td colspan="4" class="empty">Unable to load transactions. '+escapeHTML(walletLoadError)+'</td></tr>';
+return;
+}
+if(!transactionRecords.length){
+body.innerHTML='<tr><td colspan="4" class="empty">No transactions found for this account.</td></tr>';
+return;
+}
+
+body.innerHTML=transactionRecords.map(t=>`
+<tr>
+<td>${escapeHTML(t.description||t.type||'Transaction')}</td>
+<td>${escapeHTML(formatDate(t.created_at))}</td>
+<td><span class="badge ${statusClass(t.status)}">${escapeHTML(t.status||'unknown')}</span></td>
+<td>${escapeHTML(transactionAmount(t))}</td>
+</tr>`).join('');
+}
+
+function renderRecent(){
+const list=document.getElementById('recentList');
+
+if(!vyntraSession){
+list.innerHTML='<div class="empty">Sign in to view your transactions.</div>';
+return;
+}
+if(walletLoadError){
+list.innerHTML='<div class="empty">Could not load recent activity.</div>';
+return;
+}
+if(!transactionRecords.length){
+list.innerHTML='<div class="empty">No transactions yet.</div>';
+return;
+}
+
+list.innerHTML=transactionRecords.slice(0,3).map(t=>`
+<div class="item">
+<div><strong>${escapeHTML(t.description||t.type||'Transaction')}</strong><small>${escapeHTML(formatDate(t.created_at))}</small></div>
+<span class="badge ${statusClass(t.status)}">${escapeHTML(t.status||'unknown')}</span>
+<strong>${escapeHTML(transactionAmount(t))}</strong>
+</div>`).join('');
+}
+
+async function loadWalletData(){
+if(!vyntraSupabase||!vyntraSession?.user?.id)return;
+
+const notice=document.getElementById('walletNotice');
+notice.textContent='Loading your wallet and transaction records…';
+walletLoadError=null;
+
+try{
+const userId=vyntraSession.user.id;
+
+const [walletResult,transactionResult]=await Promise.all([
+vyntraSupabase.from('wallets')
+.select('currency,balance,status')
+.eq('user_id',userId),
+vyntraSupabase.from('transactions')
+.select('id,type,currency,amount,status,description,created_at')
+.eq('user_id',userId)
+.order('created_at',{ascending:false})
+.limit(50)
+]);
+
+if(walletResult.error)throw new Error('Wallet: '+walletResult.error.message);
+if(transactionResult.error)throw new Error('Transactions: '+transactionResult.error.message);
+
+walletRecords=walletResult.data||[];
+transactionRecords=transactionResult.data||[];
+
+renderWallet();
+renderTransactions();
+renderRecent();
+
+if(walletRecords.length===0){
+notice.textContent='Your account has no wallet records yet. The database setup step is required to create your NGN, USD, GBP and EUR wallets. No funds have been added.';
+}else{
+notice.textContent='Wallet information loaded from your Supabase account. Balances are read-only in this app.';
+}
+}catch(error){
+walletLoadError=error.message||'Unknown database error';
+notice.textContent='Wallet data could not be loaded: '+walletLoadError;
+renderTransactions();
+renderRecent();
+toast('Wallet loading failed. Check your Supabase database setup.');
+console.error('Vyntra wallet error:',error);
+}
+}
+
+/* AUTHENTICATION */
+const authConfigured=!!(
+window.VYNTRA_SUPABASE_URL&&
+window.VYNTRA_SUPABASE_ANON_KEY&&
+!String(window.VYNTRA_SUPABASE_URL).includes('YOUR_')&&
+!String(window.VYNTRA_SUPABASE_ANON_KEY).includes('YOUR_')
+);
+
+function authUi(show,title,subtitle,notice){
+document.getElementById('authback').classList.toggle('show',!!show);
+if(title)document.getElementById('authTitle').textContent=title;
+if(subtitle)document.getElementById('authSubtitle').textContent=subtitle;
+if(notice!==undefined)document.getElementById('authNotice').textContent=notice;
+}
+
+function setAuthMode(mode){
+vyntraAuthMode=mode;
+const signup=mode==='signup';
+document.getElementById('authTitle').textContent=signup?'Create your account':'Welcome back';
+document.getElementById('authSubtitle').textContent=signup?'Join Vyntra using your email address.':'Sign in to access your Vyntra account.';
+document.getElementById('authNameWrap').style.display=signup?'block':'none';
+document.getElementById('authSubmit').textContent=signup?'Create account':'Sign in';
+document.getElementById('authSwitch').textContent=signup?'Already registered? Sign in':'New to Vyntra? Create an account';
+document.getElementById('authPassword').autocomplete=signup?'new-password':'current-password';
+}
+
+document.getElementById('authSwitch').addEventListener('click',()=>{
+setAuthMode(vyntraAuthMode==='login'?'signup':'login');
+});
+
+function showUserSession(session){
+vyntraSession=session;
+const email=session?.user?.email||'';
+const avatar=document.querySelector('.avatar');
+if(avatar)avatar.textContent=email?email[0].toUpperCase():'U';
+
+const pill=document.querySelector('.header-right .pill');
+if(pill)pill.textContent='● Secure account';
+
+document.getElementById('accountStatus').textContent='ACCOUNT CONNECTED';
+
+let old=document.getElementById('vyntraSignOut');
+if(old)old.remove();
+
+if(email){
+const b=document.createElement('button');
+b.id='vyntraSignOut';
+b.className='btn ghost';
+b.style.padding='8px 10px';
+b.textContent='Sign out';
+b.onclick=async()=>{
+const {error}=await vyntraSupabase.auth.signOut();
+if(error){toast(error.message);return;}
+vyntraSession=null;
+walletRecords=[];
+transactionRecords=[];
+walletLoadError=null;
+renderWallet();
+renderTransactions();
+renderRecent();
+document.getElementById('walletNotice').textContent='Sign in to load your wallet balances.';
+document.getElementById('accountStatus').textContent='ACCOUNT NOT CONNECTED';
+authUi(true);
+};
+document.querySelector('.header-right').appendChild(b);
+}
+}
+
+async function submitVyntraAuth(){
+if(!authConfigured||!vyntraSupabase){
+authUi(true,'Authentication setup required','Connect your Supabase project first.','Check config.js for your Supabase project URL and public key.');
+return;
+}
+
+const email=document.getElementById('authEmail').value.trim();
+const password=document.getElementById('authPassword').value;
+const fullName=document.getElementById('authName').value.trim();
+
+if(!email||password.length<8){
+toast('Enter a valid email and a password of at least 8 characters.');
+return;
+}
+if(vyntraAuthMode==='signup'&&!fullName){
+toast('Enter your full name.');
+return;
+}
+
+const button=document.getElementById('authSubmit');
+button.disabled=true;
+button.textContent='Please wait…';
+
+try{
+let result;
+if(vyntraAuthMode==='signup'){
+result=await vyntraSupabase.auth.signUp({
+email,password,
+options:{data:{full_name:fullName}}
+});
+if(!result.error&&!result.data.session){
+authUi(true,'Check your email','Confirm your email address, then return here to sign in.','Supabase email confirmation is enabled. Check your inbox.');
+setAuthMode('login');
+}
+}else{
+result=await vyntraSupabase.auth.signInWithPassword({email,password});
+}
+
+if(result.error){
+toast(result.error.message);
+}else if(result.data.session){
+showUserSession(result.data.session);
+authUi(false);
+await loadWalletData();
+toast('You are signed in.');
+}
+}catch(error){
+toast('Authentication error: '+error.message);
+}finally{
+button.disabled=false;
+button.textContent=vyntraAuthMode==='signup'?'Create account':'Sign in';
+}
+}
+
+document.getElementById('authSubmit').addEventListener('click',submitVyntraAuth);
+document.getElementById('authPassword').addEventListener('keydown',e=>{
+if(e.key==='Enter')submitVyntraAuth();
+});
+
+/* STARTUP */
+renderCountries();
+renderCrypto();
+renderGifts();
+renderTransactions();
+renderRecent();
+
+if(authConfigured&&window.supabase?.createClient){
+vyntraSupabase=window.supabase.createClient(
+window.VYNTRA_SUPABASE_URL,
+window.VYNTRA_SUPABASE_ANON_KEY
+);
+
+vyntraSupabase.auth.getSession().then(async({data,error})=>{
+if(error){
+toast('Could not check your login session.');
+authUi(true);
+return;
+}
+if(data.session){
+showUserSession(data.session);
+authUi(false);
+await loadWalletData();
+}else{
+authUi(true);
+}
+});
+
+vyntraSupabase.auth.onAuthStateChange((event,session)=>{
+if(session){
+showUserSession(session);
+authUi(false);
+if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'){
+setTimeout(()=>loadWalletData(),0);
+}
+}else{
+vyntraSession=null;
+walletRecords=[];
+transactionRecords=[];
+renderWallet();
+renderTransactions();
+renderRecent();
+authUi(true);
+}
+});
+}else{
+document.getElementById('authNotice').textContent=
+'Authentication is not configured. Check your Supabase project URL and public key in config.js.';
+document.getElementById('authSubmit').textContent='Authentication unavailable';
+document.getElementById('authSubmit').disabled=true;
+document.querySelector('.header-right .pill').textContent='● Not connected';
+}
+</script></body>
+</html>
